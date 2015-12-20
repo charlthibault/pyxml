@@ -1,0 +1,17 @@
+<catalog>
+  <product autocomplete="on">
+    <brand>leffe</brand>
+    <name>biere belge</name>
+    <prices>
+      <price currency="EU">12.3</price>
+      <price currency="EU">34.5</price>
+    </prices>
+  </product>
+  <product autocomplete="off">
+    <brand>ricard</brand>
+    <name>ricard</name>
+    <prices>
+      <price currency="EU">12</price>
+    </prices>
+  </product>
+</catalog>
