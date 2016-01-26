@@ -10,4 +10,4 @@ catalog = Catalog([p1, p2])
 element = PyXmlSerializer.serialize(catalog)
 
 with open('output/catalog.xml', 'wb') as fd:
-    fd.write(etree.tostring(element, pretty_print=True))
+    fd.write(etree.tostring(element, pretty_print=True, xml_declaration=True, encoding='utf-8'))

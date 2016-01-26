@@ -55,5 +55,5 @@ class PyXmlSerializer:
                 child_element = PyXmlSerializer.serialize(value)
             else:
                 child_element = etree.Element(child.name)
-                child_element.text = str(value)
+                child_element.text = child.type(value)
             element.append(child_element)

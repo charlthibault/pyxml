@@ -10,6 +10,12 @@ class PyXmlText:
         self.type = type
 
 
+class PyXmlChild:
+    def __init__(self, name: str, type: str):
+        self.name = name
+        self.type = type
+
+
 class PyXmlList:
     def __init__(self, name: str, items_type, items_tag: str=None, parent: str=None):
         self.name = name

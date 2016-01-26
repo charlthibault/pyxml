@@ -1,5 +1,5 @@
 from pyxml.helpers import get_pyxml_model, get_parameter_type
-from pyxml.model import PyXmlAttribute, PyXmlList, PyXmlModel, PyXmlText
+from pyxml.model import PyXmlAttribute, PyXmlList, PyXmlText, PyXmlChild
 
 
 def pyxml_text(text_name: str):
@@ -40,26 +40,11 @@ def pyxml_children(*children_names):
 
         for child_name in children_names:
             type = get_parameter_type(child_name, cls)
-            if hasattr(type, 'pyxml__model'):
-                child = type.pyxml__model
-            else:
-                child = PyXmlModel(child_name, type)
+            child = PyXmlChild(child_name, type)
             model.children.append(child)
         return cls
 
     return refine_model
-
-
-# def pyxml_lists(*list_names):
-#     def refine_model(cls):
-#         model = get_pyxml_model(cls)
-#
-#         for list_name in list_names:
-#             child_list = PyXmlList(list_name, list_name)
-#             model.lists.append(child_list)
-#         return cls
-#
-#     return refine_model
 
 
 def pyxml_list(name, items_type: type, items_tag: str=None, parent: str=None):

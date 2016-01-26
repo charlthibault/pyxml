@@ -1,76 +1,70 @@
 from lxml import etree
-
 from pyxml.helpers import get_pyxml_model, get_constructor_parameters
 
 
-def parse(file: str, cls: object):
-    model = get_pyxml_model(cls)
+class PyXmlParser:
+    @staticmethod
+    def parse(file: str, cls: object):
+        model = get_pyxml_model(cls)
 
-    tree = etree.parse(file).getroot()
-    return parse_element(tree, model)
+        tree = etree.parse(file).getroot()
+        return PyXmlParser.parse_element(tree, model)
 
+    @staticmethod
+    def parse_element(element, model):
+        attrib = element.attrib
+        object_attr = dict()
 
-def parse_element(element, model):
-    attrib = element.attrib
-    object_attr = dict()
+        PyXmlParser.parse_lists(element, model, object_attr)
+        PyXmlParser.parser_children(element, model, object_attr)
+        PyXmlParser.parse_attributes(attrib, model, object_attr)
 
-    for sublist in model.lists:
-        new_list = list()
-        if sublist.parent is None:
-            for item_element in element.findall(sublist.items_tag):
-                sublist_items_model = get_pyxml_model(sublist.items_type)
-                if sublist_items_model is not None:
-                    sublist_item = parse_element(item_element, sublist_items_model)
-                else:
-                    sublist_item = sublist.items_type(item_element.text)
-                new_list.append(sublist_item)
-        else:
-            parent = element.find(sublist.parent)
+        if model.text is not None:
+            object_attr[model.text.name] = model.text.type(element.text)
+        if len(object_attr) == 0:
+            object_attr[model.name] = model.type(element.text)
+
+        return PyXmlParser.build_object(model, object_attr)
+
+    @staticmethod
+    def parse_lists(element, model, object_attr):
+        for sublist in model.lists:
+            new_list = list()
+            if sublist.parent is None:
+                parent = element
+            else:
+                parent = element.find(sublist.parent)
+
             for item_element in parent.findall(sublist.items_tag):
                 sublist_items_model = get_pyxml_model(sublist.items_type)
                 if sublist_items_model is not None:
-                    sublist_item = parse_element(item_element, sublist_items_model)
+                    sublist_item = PyXmlParser.parse_element(item_element, sublist_items_model)
                 else:
                     sublist_item = sublist.items_type(item_element.text)
                 new_list.append(sublist_item)
-        object_attr[sublist.name] = new_list
+            object_attr[sublist.name] = new_list
 
-    for child_model in model.children:
-        child_element = element.find(child_model.name)
-        if child_model is not None:
-            child_obj = parse_element(child_element, child_model)
-        else:
-            child_obj = sublist.items_type(child_element.text)
-        object_attr[child_model.name] = child_obj
+    @staticmethod
+    def parser_children(element, model, object_attr):
+        for child_model in model.children:
+            child_element = element.find(child_model.name)
+            if hasattr(child_model.type, 'pyxml__model'):
+                child_obj = PyXmlParser.parse_element(child_element, child_model.type.pyxml__model)
+            else:
+                child_obj = child_model.type(child_element.text)
+            object_attr[child_model.name] = child_obj
 
+    @staticmethod
+    def parse_attributes(attrib, model, object_attr):
+        for attr in model.attrib:
+            if attr.name in attrib:
+                object_attr[attr.name] = attr.type(attrib[attr.name])
 
-    for attr in model.attrib:
-        if attr.name in attrib:
-            object_attr[attr.name] = attr.type(attrib[attr.name])
-
-    if model.text is not None:
-        object_attr[model.text.name] = model.text.type(element.text)
-
-    if len(object_attr) == 0:
-        object_attr[model.name] = model.type(element.text)
-
-    constructor_params = list()
-    parameters = get_constructor_parameters(model.type)
-    for name in parameters:
-        if name != 'self' and name in object_attr:
-            constructor_params.append(object_attr[name])
-
-    return model.type(*constructor_params)
-
-
-
-# for child in tree.children():
-# if model.name not in child.tag:
-# raise Exception('Model does not match xml file')
-#
-#
-# if model.text is not None:
-#         text_attribute
-
-
-
+    @staticmethod
+    def build_object(model, object_attr):
+        constructor_params = list()
+        parameters = get_constructor_parameters(model.type)
+        for name in parameters:
+            if name != 'self' and name in object_attr:
+                constructor_params.append(object_attr[name])
+        return model.type(*constructor_params)

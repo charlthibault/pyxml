@@ -1,6 +1,6 @@
 from model.catalog import Catalog
-from pyxml.parser import parse
+from pyxml.parser import PyXmlParser
 
-catalog = parse('output/catalog.xml', Catalog)
+catalog = PyXmlParser.parse('output/catalog.xml', Catalog)
 
 print(catalog)

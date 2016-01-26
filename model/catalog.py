@@ -8,6 +8,10 @@ class Price:
         self.value = value
         self.currency = currency
 
+    def __str__(self):
+        return 'value: {}\n\t\tcurrency: {}\n\t\t'.format(self.value,
+                                                self.currency)
+
 
 @pyxml_children('brand', 'name')
 @pyxml_attributes('autocomplete')
@@ -19,8 +23,22 @@ class Product:
         self.autocomplete = autocomplete
         self.prices = prices
 
+    def __str__(self):
+        output = 'name: {}\n\tbrand: {}\n\tautocomplete: {}\n\tprices: \n\t\t'.format(self.name,
+                                                                              self.brand,
+                                                                              self.autocomplete)
+        for price in self.prices:
+            output += '{}\n\t\t'.format(price)
+        return output
+
 
 @pyxml_list('products', items_type=Product, items_tag='product')
 class Catalog:
     def __init__(self, products: list):
         self.products = products
+
+    def __str__(self):
+        output =  'Products: \n\t'
+        for product in self.products:
+            output += '{}\n\t'.format(product)
+        return output
