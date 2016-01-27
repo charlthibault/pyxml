@@ -30,3 +30,17 @@ def get_parameter_type(parameter_name, cls):
             return parameter.annotation
 
     return None
+
+
+def find_all(tag, element, model):
+    if model.namespace is not None:
+        return element.findall('{{{}}}{}'.format(model.namespace, tag))
+    else:
+        return element.finall(tag)
+
+
+def find(tag, element, model):
+    if model.namespace is not None:
+        return element.find('{{{}}}{}'.format(model.namespace, tag))
+    else:
+        return element.find(tag)

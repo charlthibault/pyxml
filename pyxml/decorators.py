@@ -56,3 +56,13 @@ def pyxml_list(name, items_type: type, items_tag: str=None, parent: str=None):
         return cls
 
     return refine_model
+
+
+def pyxml_namespace(namespace: str):
+    def refine_model(cls):
+        model = get_pyxml_model(cls)
+
+        model.namespace = namespace
+        return cls
+
+    return refine_model

@@ -1,5 +1,5 @@
 from lxml import etree
-from pyxml.helpers import get_pyxml_model, get_constructor_parameters
+from pyxml.helpers import get_pyxml_model, get_constructor_parameters, find, find_all
 
 
 class PyXmlParser:
@@ -33,9 +33,9 @@ class PyXmlParser:
             if sublist.parent is None:
                 parent = element
             else:
-                parent = element.find(sublist.parent)
+                parent = find(sublist.parent, element, model)
 
-            for item_element in parent.findall(sublist.items_tag):
+            for item_element in find_all(sublist.items_tag, parent, model):
                 sublist_items_model = get_pyxml_model(sublist.items_type)
                 if sublist_items_model is not None:
                     sublist_item = PyXmlParser.parse_element(item_element, sublist_items_model)
@@ -47,7 +47,7 @@ class PyXmlParser:
     @staticmethod
     def parser_children(element, model, object_attr):
         for child_model in model.children:
-            child_element = element.find(child_model.name)
+            child_element = find(child_model.name, element, model)
             if hasattr(child_model.type, 'pyxml__model'):
                 child_obj = PyXmlParser.parse_element(child_element, child_model.type.pyxml__model)
             else:

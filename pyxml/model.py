@@ -30,6 +30,7 @@ class PyXmlModel:
         self.attrib = list()
         self.children = list()
         self.text = None
+        self.namespace = None
         self.name = name
         self.type = type
 
